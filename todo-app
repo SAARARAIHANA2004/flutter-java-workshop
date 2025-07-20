@@ -1,0 +1,142 @@
+import &#39;package:flutter/material.dart&#39;;
+void main() {
+  runApp(const MyApp());
+}
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: TodoApp(),
+    );
+  }
+}
+class TodoApp extends StatefulWidget {
+  @override
+  State&lt;TodoApp&gt; createState() =&gt; _TodoAppState();
+}
+class _TodoAppState extends State&lt;TodoApp&gt; {
+  final TextEditingController taskController = TextEditingController();
+  List&lt;Map&lt;String, dynamic&gt;&gt; tasks = [];
+  void addTask() {
+    if (taskController.text.isNotEmpty) {
+      setState(() {
+        tasks.add({
+          &#39;task&#39;: taskController.text,
+          &#39;date&#39;: DateTime.now(),
+          &#39;completed&#39;: false,
+        });
+        taskController.clear();
+      });
+    }
+  }
+  void deleteTask(int index) {
+    setState(() {
+      tasks.removeAt(index);
+    });
+
+  }
+  void toggleTask(int index) {
+    setState(() {
+      tasks[index][&#39;completed&#39;] = !tasks[index][&#39;completed&#39;];
+    });
+  }
+  @override
+  Widget build(BuildContext context) {
+    int completedTasks = tasks.where((task) =&gt; task[&#39;completed&#39;]).length;
+    return Scaffold(
+      backgroundColor: Colors.purple.shade50,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF9C27B0), Color(0xFFE040FB)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    &quot;To-Do App&quot;,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    &quot;$completedTasks of ${tasks.length} tasks completed&quot;,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: taskController,
+
+                          decoration: InputDecoration(
+                            hintText: &quot;What needs to be done?&quot;,
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: addTask,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purple,
+                          shape: const CircleBorder(),
+                        ),
+                        child: const Icon(Icons.add),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(20),
+                itemCount: tasks.length,
+                itemBuilder: (context, index) {
+                  var task = tasks[index];
+                  return Card(
+                    child: ListTile(
+                      leading: Checkbox(
+                        value: task[&#39;completed&#39;],
+                        onChanged: (_) =&gt; toggleTask(index),
+                      ),
+                      title: Text(task[&#39;task&#39;]),
+                      subtitle: Text(
+                       
+&quot;${task[&#39;date&#39;].day}/${task[&#39;date&#39;].month}/${task[&#39;date&#39;].year}&quot;,
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () =&gt; deleteTask(index),
+                      ),
+                    ),
+                  );
+
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
